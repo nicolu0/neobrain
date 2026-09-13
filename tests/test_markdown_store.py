@@ -76,3 +76,8 @@ def test_keyword_search_matching_facts_with_question(store):
     store.append("User doesn't like to eat ice cream")
     store.append("User is a software engineer")
     assert store.keyword_search("What does the user love to eat?") == ["User loves to eat pizza", "User likes to eat salad", "User doesn't like to eat ice cream"]
+
+def test_keyword_search_contradiction(store):
+    store.append("User lives in California")
+    store.append("User lives in New York")
+    assert store.keyword_search("City in which user lives") == ["User lives in California", "User lives in New York"]
