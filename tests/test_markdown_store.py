@@ -50,5 +50,29 @@ def test_tokenize(store):
     tokens = store._tokenize("User likes pizza, pasta, and burgers. User doesn't like vegetables.")
     assert tokens == {"likes", "pizza", "pasta", "burgers", "vegetables"}
     
-def test_keyword_search(store):
-    pass
+def test_keyword_search_empty_store(store):
+    assert store.keyword_search("What does the user like?") == []
+
+def test_keyword_search_only_stopwords(store):
+    store.append("User likes to eat pizza")
+    assert store.keyword_search("the and or is but") == []
+
+def test_keyword_search_one_non_overlapping_fact(store):
+    store.append("User likes to eat pizza")
+    assert store.keyword_search("User hates drinking water") == []
+
+def test_keyword_search_one_overlapping_fact(store):
+    store.append("User likes to eat pizza")
+    assert store.keyword_search("User loves to eat burgers") == ["User likes to eat pizza"]
+
+def test_keyword_search_multiple_overlapping_facts(store):
+    store.append("User likes to eat pizza with sausage and pepperoni")
+    store.append("User loves to eat pizza with sausage")
+    assert store.keyword_search("User likes to put sausage and pepperoni on his pizza") == ["User likes to eat pizza with sausage and pepperoni", "User loves to eat pizza with sausage"]
+
+def test_keyword_search_matching_facts_with_question(store):
+    store.append("User loves to eat pizza")
+    store.append("User likes to eat salad")
+    store.append("User doesn't like to eat ice cream")
+    store.append("User is a software engineer")
+    assert store.keyword_search("What does the user love to eat?") == ["User loves to eat pizza", "User likes to eat salad", "User doesn't like to eat ice cream"]
